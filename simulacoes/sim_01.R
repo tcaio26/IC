@@ -1,4 +1,6 @@
-library(ggplot2)
+library(pacman)
+p_load(tidyverse, GGally)
+#processo estocástico simples
 
 l = 5*10^3
 
@@ -39,3 +41,23 @@ ggplot(data=probs,aes(x=t))+
   scale_x_continuous(trans='log10')+
   scale_y_continuous( breaks = seq(0,1,0.05))+
   theme_bw()
+
+
+#moedas com apenas uma U, acoplamento
+
+moedas = data.frame(m1 = 0, m2 = 0, m3 = 0, m4 = 0)
+
+p = c(0.5, 0.7, 0.2, 0.5)
+l = 10^4
+for(i in 1:l){
+  if(i==l) moedas = moedas[-1,]
+  u = runif(1)
+  m1 = ifelse(u<p[1],0,1)
+  m2 = ifelse(u<p[2],1,0)
+  m3 = ifelse(u<p[3],1,0)
+  m4 = ifelse(u<p[4],1,0)
+  moedas = rbind(moedas, c(m1,m2,m3,m4))
+}
+cor(moedas)
+moedas %>% pivot_longer(1:4, names_to = 'moeda', values_to = 'cara') %>% group_by(moeda) %>% 
+  summarise(p = sum(cara)/l)
