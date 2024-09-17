@@ -1,5 +1,5 @@
 library(pacman)
-p_load(tidyverse, GGally)
+p_load(tidyverse, GGally, forecast, numbers)
 #processo estocástico simples
 
 l = 5*10^3
@@ -66,14 +66,15 @@ moedas %>% pivot_longer(1:4, names_to = 'moeda', values_to = 'cara') %>% group_b
 #simulação de autoregressão binaria com q(x) = 1/[k(1+exp(-2x))]
 
 z = function(x) (2*(1+exp(-2*x)))^(-1)
-theta = function(k) k^(-2)
+theta = function(k) ifelse(k<=100,(k/2)^(-2),0)
 
-serie = function(n, soma=F){
-  for(i in 1:100){
+serie = function(n){
+  for(i in 1:n){
     u = runif(1)
     if(i ==1){
       x = ifelse(u<z(theta(0)),1,-1)
       serie = c(x)
+      seriesoma = c(x)
     }
     else if(i>1){
       soma = 0
@@ -82,12 +83,61 @@ serie = function(n, soma=F){
       }
       x = ifelse(u<z(theta(0)+soma),1,-1)
       serie = append(serie, x)
+      seriesoma = append(seriesoma, seriesoma[i-1]+x)
     }
   }
-  if(!soma) return(serie)
-  if(soma) return(sum(serie))
+  return(list(serie = serie, soma = seriesoma))
 }
 
+st = serie(10^3)$soma %>% ts()
+plot(st)
+
+
 series = c()
-for(i in 1:1000) series = append(series, serie(100,T))
+for(i in 1:1000) series = append(series, sum(serie(100)$serie))
 hist(series)
+
+#simulação de duas autoregressões acopladas
+
+z_1 = function(x) (2*(1+exp(-2*x)))^(-1)
+theta_1 = function(k) ifelse(k<2,1,0)
+
+z_2 = function(x) ((1+exp(-2*x)))^(-1)
+theta_2 = function(k) (k+1)^(-2)
+
+serie_dupla = function(n){
+  for(i in 1:n){
+    u = runif(1)
+    if(i==1){
+      x1 = ifelse(u<z_1(theta_1(0)),1,-1)
+      x2 = ifelse(u<z_2(theta_2(0)),1,-1)
+      serie_1 = c(x1)
+      serie_2 = c(x2)
+      soma1 = c(x1)
+      soma2 = c(x2)
+    }
+    else if(i>1){
+      g1 = 0
+      g2 = 0
+      for(j in 1:(i-1)){
+        g1 = g1 + theta_1(j)*serie_1[i-j]
+        g2 = g2 + theta_2(j)*serie_2[i-j]
+      }
+      print(c(z_1(theta_1(0)+g1), z_2(theta_2(0)+g2)))
+      x1 = ifelse(u<z_1(theta_1(0)+g1),1,-1)
+      x2 = ifelse(u<z_2(theta_2(0)+g2),1,-1)
+      
+      serie_1 = append(serie_1, x1)
+      serie_2 = append(serie_2, x2)
+      soma1 = append(soma1, soma1[i-1]+x1)
+      soma2 = append(soma2, soma2[i-1]+x2)
+    }
+  }
+  return(list(series = data.frame('s1' = serie_1, 's2' = serie_2), 
+              somas = data.frame('s1' = soma1, 's2' = soma2)))
+}
+
+sts = serie_dupla(200)$somas
+plot(c(0, 200), c(min(min(sts$s1),min(sts$s2)), max(max(sts$s1),max(sts$s2))))
+lines(sts$s2, col = 'green')
+lines(sts$s1, col = 'red')
