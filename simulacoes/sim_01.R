@@ -58,6 +58,36 @@ for(i in 1:l){
   m4 = ifelse(u<p[4],1,0)
   moedas = rbind(moedas, c(m1,m2,m3,m4))
 }
-cor(moedas)
+cor(moedas) #as probabilidades são igual o que se espera, mas as moedas são altamente correlacionadas.
 moedas %>% pivot_longer(1:4, names_to = 'moeda', values_to = 'cara') %>% group_by(moeda) %>% 
   summarise(p = sum(cara)/l)
+
+
+#simulação de autoregressão binaria com q(x) = 1/[k(1+exp(-2x))]
+
+z = function(x) (2*(1+exp(-2*x)))^(-1)
+theta = function(k) k^(-2)
+
+serie = function(n, soma=F){
+  for(i in 1:100){
+    u = runif(1)
+    if(i ==1){
+      x = ifelse(u<z(theta(0)),1,-1)
+      serie = c(x)
+    }
+    else if(i>1){
+      soma = 0
+      for(j in 1:(i-1)){
+        soma = soma + theta(j)*serie[i-j]
+      }
+      x = ifelse(u<z(theta(0)+soma),1,-1)
+      serie = append(serie, x)
+    }
+  }
+  if(!soma) return(serie)
+  if(soma) return(sum(serie))
+}
+
+series = c()
+for(i in 1:1000) series = append(series, serie(100,T))
+hist(series)
