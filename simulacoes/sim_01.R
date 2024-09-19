@@ -99,8 +99,8 @@ hist(series)
 
 #simulação de duas autoregressões acopladas
 
-z_1 = function(x) (2*(1+exp(-2*x)))^(-1)
-theta_1 = function(k) ifelse(k<2,1,0)
+z_1 = function(x) exp(x)/(2*cosh(x))
+theta_1 = function(k) ifelse(k<20,1,k^(-4))
 
 z_2 = function(x) ((1+exp(-2*x)))^(-1)
 theta_2 = function(k) (k+1)^(-2)
