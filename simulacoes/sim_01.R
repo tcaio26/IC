@@ -68,20 +68,20 @@ moedas %>% pivot_longer(1:4, names_to = 'moeda', values_to = 'cara') %>% group_b
 z = function(x) (2*(1+exp(-2*x)))^(-1)
 theta = function(k) ifelse(k<=100,(k/2)^(-2),0)
 
-serie = function(n){
-  for(i in 1:n){
+serie = function(n, prev){
+  for(i in prev:(n+prev)){
     u = runif(1)
-    if(i ==1){
-      x = ifelse(u<z(theta(0)),1,-1)
-      serie = c(x)
-      seriesoma = c(x)
+    if(i ==prev){
+      comeco = sample(c(-1,1),prev,T)
+      serie = comeco
+      seriesoma = c(sum(comeco))
     }
-    else if(i>1){
+    else if(i>prev){
       soma = 0
       for(j in 1:(i-1)){
         soma = soma + theta(j)*serie[i-j]
       }
-      x = ifelse(u<z(theta(0)+soma),1,-1)
+      x = ifelse(u<z(soma),1,-1)
       serie = append(serie, x)
       seriesoma = append(seriesoma, seriesoma[i-1]+x)
     }
@@ -89,7 +89,7 @@ serie = function(n){
   return(list(serie = serie, soma = seriesoma))
 }
 
-st = serie(10^3)$soma %>% ts()
+st = serie(10^3, 20)$soma %>% ts()
 plot(st)
 
 
