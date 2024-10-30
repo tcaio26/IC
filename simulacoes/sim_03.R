@@ -1,21 +1,51 @@
-library(CEMAV)
+library(data.tree)
+library(tidyverse)
 
-set.seed(247005)
+string = '10001'
+str_vector = str_split_1(string,'')
 
-pk = function(k, a, b, c, d){
-  p = ifelse(k==0, a,
-             ifelse(k==1, b,
-                    ifelse(k==2, c, d)))
-  return(p)
+print(raiz, 'c0', 'c1')
+
+raiz = Node$new('raiz')
+raiz$c1 = raiz$c0 = 1
+
+raiz$c1 = raiz$c1+1
+raiz$AddChild('0', c0 = 0, c1 = 1)
+raiz$AddChild('1', c0 = 0, c1 = 1)
+
+raiz$c0 == 1
+
+node = raiz$children[[2]]
+node = raiz
+node = node$children[[1]]
+node$c1
+
+#função para mudar a arvore
+algo = function(u, z){
+  z = z+1
+  if(u == 0){
+    if(raiz$c0==1){
+      
+    }
+    for(i in 1:length(z)){
+      
+    }
+  }
 }
 
-fonte1 = cemav_bin(1000, qk = function(x) pk(x, a=0,b=0.7,c=0.8,d=0.75), q_inf=0.75, q0 = 0)
-fonte2 = cemav_bin(1000, qk = function(x) pk(x, a=0,b=0.8,c=0.6,d=0.7), q_inf=0.7, q0 = 0)
+#looop
+raiz = Node$new('raiz')
+raiz$c1 = raiz$c0 = 1
+u = as.numeric(str_vector[1])
+raiz$c0 = raiz$c0 + (1-u)
+raiz$c1 = raiz$c1 + u
+raiz$AddChild('0', c0 = (1-u), c1 = u)
+raiz$AddChild('1', c0 = (1-u), c1 = u)
 
-
-#utilizando algoritmo SMC
-
-#parte1: algoritmo BIC
-
-i = l = 0
-u = 100
+for(i in 2:length(str_vector)){
+  u = as.numeric(str_vector[i])
+  z = as.numeric(rev(str_vector[1:(i-1)]))
+  if(u==0){
+    
+  }
+}
