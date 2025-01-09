@@ -1,0 +1,22 @@
+DIÁRIO DE PESQUISA
+------------------
+
+02/01/2025
+- criei o diário de pesquisa, bem mais tarde do que deveria, para registrar o que faço de novo.
+- tentei aplicar a matriz esqueleto em algumas árvores bem simples, alguns resultados (falta confirmação do Gallesco):
+    - CEMAVs diferentes podem ter a mesma matriz esqueleto (?) 
+    - Portanto provar propriedades do esqueleto provaria as propriedades para as duas (?)
+------------------
+
+03/01/2025
+- Lendo a primeira aplicação em Galves, Leonardi (2021), fui ver o artigo "A generalization of the PST algorithm: modeling
+the sparse nature of protein sequences", F. Leonardi (2006) (https://academic.oup.com/bioinformatics/article/22/11/1302/238221)
+    - O artigo de Leonardi lida com SMC (Sparse Markov Chains), ao invés da probabilidade depender de x_i = x, depende de x_i \in A, ou seja, alguns contextos (ou parte deles) são equivalentes. 
+    - página 1003: a soma dos N([a1,a2]w,a)- N(a1w,a) - N(a2w,a) não cancela (?) sobrando só os logs
+    - várias dúvidas anotadas
+    - li até a pag 4.
+- fiz uma representação binaria do meu nome na parede, vou construir a árvore contexto. Só "Caio" já dá 01100011011000010110100101101111.
+------------------
+
+
+
