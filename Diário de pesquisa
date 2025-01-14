@@ -18,5 +18,8 @@ the sparse nature of protein sequences", F. Leonardi (2006) (https://academic.ou
 - fiz uma representação binaria do meu nome na parede, vou construir a árvore contexto. Só "Caio" já dá 01100011011000010110100101101111.
 ------------------
 
-
+13/01/2025
+- Terminei o artigo de Leonardi. Pouco progresso nos últimos dias. Anotações a serem feitas no final do artigo, entender melhor o threshold FP/FN. 
+- Esboço de algoritmo no caderno, mas preciso entender melhor o que é isso que o gallesco fez.
+- No fds da última entrada (4, 5/1), fiz metade da árvore de contexto de "Caio", "Ca". Já está bem grande na parede e falta espaço para folhas novas.
 
