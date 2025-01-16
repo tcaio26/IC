@@ -22,4 +22,16 @@ the sparse nature of protein sequences", F. Leonardi (2006) (https://academic.ou
 - Terminei o artigo de Leonardi. Pouco progresso nos últimos dias. Anotações a serem feitas no final do artigo, entender melhor o threshold FP/FN. 
 - Esboço de algoritmo no caderno, mas preciso entender melhor o que é isso que o gallesco fez.
 - No fds da última entrada (4, 5/1), fiz metade da árvore de contexto de "Caio", "Ca". Já está bem grande na parede e falta espaço para folhas novas.
+------------------
 
+14/01/2025
+- Muita procrastinação mas peguei o artigo do gallesco de novo para ler, muitas anotações.
+    - Várias perguntas
+    - Preciso relembrar termos básicos de irredutibilidade, aperiodicidade, etc.
+    - Tentar extrair a matriz P de probabilidades no mesmo formato que a matriz M, e ver propriedades que aparecem. Pode ser um caminho pro algoritmo.
+    - O que é algebra booleana?
+    - Queria ler tudo mas não consigo nem entender o que está sendo dito a partir do Lema 2.
+------------------
+
+15/01/2025
+sem progresso
