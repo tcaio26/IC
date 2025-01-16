@@ -35,3 +35,14 @@ the sparse nature of protein sequences", F. Leonardi (2006) (https://academic.ou
 
 15/01/2025
 sem progresso
+------------------
+
+16/01/2025
+- Estudei algumas propriedades:
+    - Estabeleci identificação de contextos redundantes na matriz de probabilidades, mas acho que não faz sentido já ter ela extraída.
+- Montei um pseudo-algoritmo que assume que você já tem uma árvore pré-cortes.
+Reunião com Gallesco:
+    - Projeção canônica: Definição de espaço amostral t.q. a V.A. é uma função identidade. Exemplo com Bernoulli: 
+        Omega = {0,1} => Y(0) = 0, Y(1) = 1, P[0]=P[Y=0]=1-p. Não canônica: Omega = {a,b}, Y(a) = 1, P[Y=1]=P[a]=p
+    - O pseudo-algoritmo é legal, mas seria ótimo (possível??) conseguir um algoritmo que não precisa de uma árvore pronta.
+        - ideia: já estabelecido N_min, checar ao longo da construção da árvore se já existe base para dizer que uma prob. é 0, parar se for o caso.
