@@ -46,3 +46,15 @@ Reunião com Gallesco:
         Omega = {0,1} => Y(0) = 0, Y(1) = 1, P[0]=P[Y=0]=1-p. Não canônica: Omega = {a,b}, Y(a) = 1, P[Y=1]=P[a]=p
     - O pseudo-algoritmo é legal, mas seria ótimo (possível??) conseguir um algoritmo que não precisa de uma árvore pronta.
         - ideia: já estabelecido N_min, checar ao longo da construção da árvore se já existe base para dizer que uma prob. é 0, parar se for o caso.
+------------------
+
+17/01/2025
+sem progresso
+------------------
+
+18/01/2025
+Montei o pseudo-algoritmo com paradas para tentar extrair o esqueleto sem precisar construir toda a árvore. Caso detecte um nodo com P()=0 que tenha contagem Nmin, 
+o algoritmo busca a sequência de "probabilidade nula" na amostra para confirmar e, caso não encontre, já corta a árvore naquele ponto. Alguns possíveis problemas:
+    - modifiquei uma parte importante do algortimo do Rissanen, permitindo que folhas sejam inicializadas com (0,0). Isso quebra as propriedades de contagem, como por exemplo
+      c(z,u) = c(z0, u) + c(z1, u). No entanto, acredito que não seja muito importante para o propósito do esqueleto, já que a estimação das probabilidades não importa, só se é nula.
+Ainda preciso testar com exemplos e ver com o gallesco, mas acho que é um grande avanço
