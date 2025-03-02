@@ -117,8 +117,10 @@ for(c in c_2_10){
 
 #Criação das probabilidades
 probabilidades = numeric(length(contextos))
+probabilidades[1:2] = c(1,0)
+
 p = 0.3
-for(i in 1:length(probabilidades)){
+for(i in 3:length(probabilidades)){
   prob = rnorm(1, mean = p, sd = 0.2)
   if(prob>=1) prob = 0.95
   if(prob<=0) prob = 0.05
