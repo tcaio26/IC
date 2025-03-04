@@ -4,7 +4,7 @@ set.seed(247005)
 contextos = c(
   "10", #2
   "111", #3
-  "1100", 
+  "1100",
   "1101", #4
   "10100",
   "10001",
@@ -117,9 +117,8 @@ for(c in c_2_10){
 
 #Criação das probabilidades
 probabilidades = numeric(length(contextos))
-probabilidades[1:2] = c(1,0)
-
 p = 0.3
+probabilidades[1:2] = c(1, 0)
 for(i in 3:length(probabilidades)){
   prob = rnorm(1, mean = p, sd = 0.2)
   if(prob>=1) prob = 0.95
