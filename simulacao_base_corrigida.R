@@ -2,13 +2,14 @@
 
 library(VLMC)
 library(stringr)
+library(PST)
 
 contextos = c(
   '000', '100', '10', '001', '101', '011', '111' #"mais recente" na direita, deve ser lido ao contrário <-
 )
 
 probabilidades = c(
-  0.4, 0.3, 0, 0.6, 0.5, 0.8, 0 #é impossível obter o contexto "101", já que p[1|10]=0, mas achei bom manter por enquanto
+  0.4, 0.3, 0.01, 0.6, 0.5, 0.8, 0.01 #é impossível obter o contexto "101", já que p[1|10]=0, mas achei bom manter por enquanto
 )
 
 #função
@@ -19,7 +20,9 @@ sim_cemav_bin = function(contextos, probabilidades, n, amostra_inicial = c(), te
   if(length(amostra_inicial)==0) amostra_inicial = sample(c(0,1),2*k,TRUE)
   
   l = length(amostra_inicial)
-  if(show_process) print(paste("amostra inicial:", amostra_inicial))
+  if(show_process) print(paste("amostra inicial:", paste(amostra_inicial, collapse="")))
+  
+  amostra = c(amostra_inicial)
   
   for(i in 1:n){
     passado_relevante = paste(amostra[length(amostra)-((k-1):0)], collapse = '')
@@ -42,7 +45,7 @@ sim_cemav_bin = function(contextos, probabilidades, n, amostra_inicial = c(), te
 
 #teste de ajuste
 
-teste = sim_cemav_bin(contextos, probabilidades, 10000, text = T)
+teste = sim_cemav_bin(contextos, probabilidades, 10000, text = T, show_process = T)
 
 mod_teste_2 =pstree(seqdef(teste, stsep = ''), L=5)
 
