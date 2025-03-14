@@ -49,5 +49,5 @@ teste = sim_cemav_bin(contextos, probabilidades, 10000, text = T, show_process =
 
 mod_teste_2 =pstree(seqdef(teste, stsep = ''), L=5)
 
-mod_teste_2_pruned = prune(mod_teste_2, gain="G1", C=1, delete=FALSE)
+mod_teste_2_pruned = prune(mod_teste_2, gain="G2", C=1, delete=FALSE)
 plot(mod_teste_2_pruned)
