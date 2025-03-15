@@ -1,5 +1,6 @@
-library(glue)
+require(glue)
 set.seed(247005)
+options(scipen = 999)
 #CONTEXTOS
 contextos = c(
   "10", #2
@@ -91,11 +92,11 @@ contextos = c(
 for(i in 1:(length(contextos)-1)){
   print(i)
   for(j in (i+1):length(contextos)){
-    print(j)
     if(stringr::str_detect(contextos[j], glue("{contextos[i]}$"))){
       print(glue("Propriedade violada: {contextos[i]} é sufixo de {contextos[j]}."))
       break
     }
+    print(glue::glue("{j} ok"))
   }
 } #tudo ok
 
@@ -118,7 +119,7 @@ for(c in c_2_10){
 #Criação das probabilidades
 probabilidades = numeric(length(contextos))
 p = 0.3
-probabilidades[1:2] = c(1, 0)
+probabilidades[1:2] = c(0, 0)
 for(i in 3:length(probabilidades)){
   prob = rnorm(1, mean = p, sd = 0.2)
   if(prob>=1) prob = 0.95
@@ -129,39 +130,45 @@ for(i in 3:length(probabilidades)){
 }
 
 
-#junção
-contextos_lista = setNames(as.list(probabilidades), contextos)
 
-#SIMULAÇÃO
-
-
-ordem = 10
-n = 1e7
-
-# Contexto inicial
-passado = paste(sample(c("0", "1"), ordem, replace = TRUE), collapse = "") #seq de 10 com probs 0.5.
-res = character(n + ordem) #preparando o resultado, evitar mudanças de tamanho no meio deixa mais rápido.
-res[1:ordem] = strsplit(passado, "")[[1]] #grava o passado inicial no resultado.
-
-# Simulação
-for (i in (ordem + 1):(n + ordem)) { #itera n passos
-  for (l in min(nchar(passado), ordem):0) { #itera começando pelo maior contexto possível
-    candidato = substr(passado, start = nchar(passado) - l + 1, stop = nchar(passado)) #extrai l últimos símbolos do passado
-    if (!is.null(contextos_lista[[candidato]])) { #se for contexto, lista[[cand]] vai retornar as probabilidades
-      probs = c(contextos_lista[[candidato]], 1-contextos_lista[[candidato]])
-      break
+#função de simulação
+sim_cemav_bin = function(contextos, probabilidades, n, amostra_inicial = c(), text = T, show_process=F){
+  k = max(nchar(contextos))
+  if(show_process) print(paste("ordem:", k))
+  if(length(amostra_inicial)==0) amostra_inicial = sample(c(0,1),2*k,TRUE)
+  
+  l = length(amostra_inicial)
+  if(show_process) print(paste("amostra inicial:", paste(amostra_inicial, collapse="")))
+  
+  progresso = txtProgressBar(min = 0, max = n, initial = 0)
+  
+  amostra = character(l+n)
+  amostra[1:l] = amostra_inicial
+  
+  for(i in (l+1):(n+l)){
+    passado_relevante = paste(amostra[i-(k:1)], collapse = '')
+    
+    c = which(apply(array(contextos), 1, function(x) grepl(glue::glue("{x}$"),passado_relevante)))
+    
+    if(length(c)==0){
+      stop(glue::glue("SEM CONTEXTO PARA {passado_relevante}"))
     }
+    
+    else{
+      x = sample(c(0,1),1,T,c(1-probabilidades[c],probabilidades[c]))
+      amostra[i] = x
+    }
+    print(glue::glue("{(i-l)*100/n}%"))
   }
+  amostra = amostra[(l+1):(n+l)]
   
-  u = sample(c("0", "1"), size = 1, prob = probs) #gera o próximo
-  res[i] = u
-  
-  passado = paste0(passado, u)
-  if (nchar(passado) > ordem) {
-    passado = substr(passado, start = 2, stop = ordem + 1) #trim para garantir que só se considera até ordem símbolos
-  }
+  if(text) return(paste(amostra, collapse = ""))
+  else return(amostra)
 }
 
-resultados = res[(ordem + 1):(n + ordem)]
+n = 10^7
 
-cat(paste(resultados, collapse = ""), file = "amostra_o10_k3.txt")
+amostra = sim_cemav_bin(contextos, probabilidades, n, show_process = T)
+
+cat(amostra, file = "amostra_o10_k3_1m.txt")
+
