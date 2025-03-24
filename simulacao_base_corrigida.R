@@ -9,7 +9,7 @@ contextos = c(
 )
 
 probabilidades = c(
-  0.4, 0.3, 0.01, 0.6, 0.5, 0.8, 0.01 #é impossível obter o contexto "101", já que p[1|10]=0, mas achei bom manter por enquanto
+  0.4, 0.3, 0, 0.6, 0.5, 0.8, 0 #é impossível obter o contexto "101", já que p[1|10]=0, mas achei bom manter por enquanto
 )
 
 #função 1
@@ -107,7 +107,7 @@ testes4 = benchmark(sim_cemav_bin(contextos, probabilidades, 100),
 
 ####testes com árvore completa
 set.seed(247005)
-contextos = c(
+contextos_ic = c(
   "10", #2
   "111", #3
   "1100",
@@ -193,29 +193,41 @@ contextos = c(
   "1111101011" #10
 )
 
-probabilidades = numeric(length(contextos))
+probabilidades_ic = numeric(length(contextos_ic))
 p = 0.3
-probabilidades[1:2] = c(0, 0)
-for(i in 3:length(probabilidades)){
+probabilidades_ic[1:2] = c(0, 0)
+for(i in 3:length(probabilidades_ic)){
   prob = rnorm(1, mean = p, sd = 0.2)
   if(prob>=1) prob = 0.95
   if(prob<=0) prob = 0.05
-  probabilidades[i] = prob
+  probabilidades_ic[i] = prob
   print(prob)
   p = 1-prob
 }
 
-testes5 = benchmark(sim_cemav_bin(contextos, probabilidades, 1000, show_process = T),
-                   sim_cemav_bin_2(contextos, probabilidades, 1000, show_process = T),
+testes5 = benchmark(sim_cemav_bin(contextos_ic, probabilidades_ic, 1000, show_process = T),
+                   sim_cemav_bin_2(contextos_ic, probabilidades_ic, 1000, show_process = T),
                    replications = 1) #2 é aprox 10 vezes mais rápida
 
-testes6 = benchmark(sim_cemav_bin(contextos, probabilidades, 10000, show_process = T),
-                   sim_cemav_bin_2(contextos, probabilidades, 10000, show_process = T),
+testes6 = benchmark(sim_cemav_bin(contextos_ic, probabilidades_ic, 10000, show_process = T),
+                   sim_cemav_bin_2(contextos_ic, probabilidades_ic, 10000, show_process = T),
                    replications = 1) #2 é aprox 10 vezes mais rápida
 
 #a diferença parece escalar parecido (ate melhor) para árvores grandes
 #último teste:
 
-testes7 = benchmark(sim_cemav_bin(contextos, probabilidades, 10^5, show_process = T),
-                   sim_cemav_bin_2(contextos, probabilidades, 10^5, show_process = T),
+testes7 = benchmark(sim_cemav_bin(contextos_ic, probabilidades_ic, 10^5, show_process = T),
+                   sim_cemav_bin_2(contextos_ic, probabilidades_ic, 10^5, show_process = T),
                    replications = 1) #falta rodar
+
+
+
+#testando ajuste de funções
+
+amostra = sim_cemav_bin_2(contextos, probabilidades, 10000)
+summary(vlmc(str_split_1(amostra,''), alpha.c = 0.001)) #parece funcionar com alphas mais baixos, será algum erro no código original?
+
+amostra_ic = readLines("amostra_o10_k3.txt") #amostra problematica, rodar de novo e excluir essa.
+a = substr(amostra_ic, 1, 10000)
+t = summary(vlmc(str_split_1(a,''), alpha.c = 0.005))
+draw(t)
