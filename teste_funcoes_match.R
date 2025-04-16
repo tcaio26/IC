@@ -1,4 +1,4 @@
-(t = paste(sample(c(0,1),1e7,T),collapse = ''))
+t = paste(sample(c(0,1),1e7,T),collapse = '')
 
 match_expr = function(str, p) gregexpr(p, str)[[1]]
 
@@ -10,8 +10,10 @@ rbenchmark::benchmark(match_expr(t, '0'), match_expr2(t, '0'), match_expr3(t, '0
 #resultados com 10M, 100 iterações.
 # 1-90sec 2-52sec 3-65sec
 
-(t = paste(sample(c(0,1),1e5,T),collapse = ''))
-rbenchmark::benchmark(match_expr(t, '0'), match_expr2(t, '0'), match_expr3(t, '0'))
-#resultados com 100k, 100 it.
-# 1-1sec41 2-0.39sec 3-0.39sec
+t = paste(sample(c(0,1),1e5,T),collapse = '')
+rbenchmark::benchmark(match_expr(t, '0'), match_expr2(t, '0'), match_expr3(t, '0'),
+                      replications = 1000)
+#resultados com 100k, 1000 it.
+# 1 - 8.031sec      2 - 3.586sec     3 - 3.631sec
 
+#muito pouca diferença entre 2 e 3, vou usar 2 por conhecer melhor o stringr
