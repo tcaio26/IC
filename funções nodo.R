@@ -116,3 +116,35 @@ genskel = function(sample, index=1:length(sample), context){
   )
 }
 
+
+
+library(data.tree)
+
+divtree <- function(start, Nmin) { #do deepseek se já não estava óbvio
+  # Create root node
+  raiz <- Node$new('r')
+  raiz$n <- start
+  
+  # Internal recursive function to build the tree
+  build_tree <- function(node, current_val, Nmin) {
+    if (current_val > Nmin) {
+      # Create left child
+      left <- node$AddChild('left')
+      left$n <- current_val / 2
+      build_tree(left, current_val / 2, Nmin)
+      
+      # Create right child
+      right <- node$AddChild('right')
+      right$n <- current_val / 2
+      build_tree(right, current_val / 2, Nmin)
+    }
+  }
+  
+  # Start building the tree
+  build_tree(raiz, start, Nmin)
+  return(raiz)
+}
+
+# Example usage
+tree <- divtree(64, 8)
+print(tree, 'n')
