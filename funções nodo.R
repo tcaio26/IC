@@ -145,6 +145,37 @@ divtree <- function(start, Nmin) { #do deepseek se já não estava óbvio
   return(raiz)
 }
 
-# Example usage
-tree <- divtree(64, 8)
-print(tree, 'n')
+genskel = function(node, sample, index, Nmin){
+  if(length(index)>=2*Nmin){
+    #resultado 0
+    l = node$AddChild(paste0(node$name,'0'))
+    s = index[which(sample[index]==0)]+1
+    s = s[s<=max(index)]
+    l$index = s
+    l$n = length(l$index)
+    l$context = paste0(node$context,'0')
+    l$dom = ifelse(sum(sample[s])%in%c(0,l$n), sample[s][1], -1)
+    genskel(l, sample, l$index, Nmin)
+    
+    #resultado 1
+    r = node$AddChild(paste0(node$name,'1'))
+    s = index[which(sample[index]==1)]+1
+    s = s[s<=max(index)]
+    r$index = s
+    r$n = length(r$index)
+    r$context = paste0(node$context,'1')
+    r$dom = ifelse(sum(sample[s])%in%c(0,l$n), sample[s][1], -1)
+    genskel(r, sample, r$index, Nmin)
+  }
+}
+
+startskel = function(sample, Nmin){
+  raiz = Node$new("r")
+  raiz$index = 1:length(sample)
+  raiz$n = length(sample)
+  raiz$context = ''
+  raiz$dom = ifelse(sum(sample)%in%c(0,raiz$n), sample[1], -1)
+  
+  genskel(raiz, sample, raiz$index, Nmin)
+  return(raiz)
+}
