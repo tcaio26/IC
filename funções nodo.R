@@ -192,7 +192,7 @@ startskel = function(sample, Nmin, prob = F){
 st = readLines('amostra_skel_100k.txt')
 nchar(st)
 
-s = as.numeric(unlist(strsplit(st, ''))[1:1000])
+s = as.numeric(unlist(strsplit(st, '')))
 
 teste = startskel(s, 229, prob = T)
 ToDataFrameTree(t, 'n', 'context', 'dom', 'p')

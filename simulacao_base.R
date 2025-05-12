@@ -163,9 +163,9 @@ sim_cemav_bin_2 = function(contextos, probabilidades, n, amostra_inicial = c(), 
   else return(strsplit(amostra, ''))
 }
 
-n = 10^5
+n = 10^6
 
 amostra = sim_cemav_bin_2(contextos, probabilidades, n, show_process = T)
 
-cat(amostra, file = "amostra_skel_100k.txt")
+cat(amostra, file = "amostra_skel_1M.txt")
 
