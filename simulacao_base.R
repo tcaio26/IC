@@ -122,14 +122,17 @@ p = 0.3
 probabilidades[1:2] = c(0, 0)
 for(i in 3:length(probabilidades)){
   prob = rnorm(1, mean = p, sd = 0.2)
-  if(prob>=1) prob = 0.95
-  if(prob<=0) prob = 0.05
+  if(prob>=0.95) prob = 0.94 #quero evitar probabilidades muito extremas na amostra de teste.
+  if(prob<=0.05) prob = 0.06
   probabilidades[i] = prob
   print(prob)
   p = 1-prob #evitar probabilidades parecidas entre contextos parecidos. Talvez seja melhor usar sort(contextos).
 }
 
-
+#Exportação de contextos e probabilidades para fácil acesso
+library(tibble)
+df_amostra = tibble(contexto = contextos, prob = probabilidades)
+write.csv(df_amostra, 'parametros_geradores_amostra.csv')
 
 #função de simulação
 sim_cemav_bin_2 = function(contextos, probabilidades, n, amostra_inicial = c(), text = T, show_process=F){
