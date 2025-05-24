@@ -130,9 +130,9 @@ for(i in 3:length(probabilidades)){
 }
 
 #Exportação de contextos e probabilidades para fácil acesso
-library(tibble)
+library(tidyverse)
 df_amostra = tibble(contexto = contextos, prob = probabilidades)
-write.csv(df_amostra, 'parametros_geradores_amostra.csv')
+write_csv(df_amostra, 'parametros_geradores_amostra.csv')
 
 #função de simulação
 sim_cemav_bin_2 = function(contextos, probabilidades, n, amostra_inicial = c(), text = T, show_process=F){

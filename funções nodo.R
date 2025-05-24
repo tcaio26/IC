@@ -1,8 +1,8 @@
 amostra = sample(c(0,1),1000,T) #entradas
-sensib = 0.1
+sensib = 0.01
 alpha = 0.05
 
-Nmin = log(alpha, base = sensib)
+Nmin = log(alpha, base = 1-sensib)
 
 match = function(str, p){ 
   pos = stringr::str_locate_all(str, p)[[1]][, "start"]
@@ -156,7 +156,7 @@ genskel = function(node, sample, index, Nmin, prob = F){
     l$context = paste0(node$context,'0')
     l$dom = ifelse(sum(sample[s])%in%c(0,l$n), sample[s][1], -1)
     if(prob) l$p = sum(sample[s])/n
-    if(length(l$index)>=Nmin){
+    if(length(l$index)>=Nmin && l$dom <0){
       genskel(l, sample, l$index, Nmin, prob)
     }
     
@@ -170,7 +170,7 @@ genskel = function(node, sample, index, Nmin, prob = F){
     r$context = paste0(node$context,'1')
     r$dom = ifelse(sum(sample[s])%in%c(0,l$n), sample[s][1], -1)
     if(prob) r$p = sum(sample[s])/n
-    if(length(r$index)>=Nmin){
+    if(length(r$index)>=Nmin && r$dom < 0){
       genskel(r, sample, r$index, Nmin, prob)
     }
 }
@@ -189,10 +189,12 @@ startskel = function(sample, Nmin, prob = F){
 
 
 #teste com 1000 elementos da amostra da CEMAV
+df = read.csv('parametros_geradores_amostra.csv', colClasses = c('character','numeric'))
+
 st = readLines('amostra_skel_100k.txt')
 nchar(st)
 
-n = 5000
+n = 2000
 
 s = as.numeric(unlist(strsplit(st, '')))[1:n]
 
