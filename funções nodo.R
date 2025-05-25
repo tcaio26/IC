@@ -201,3 +201,52 @@ s = as.numeric(unlist(strsplit(st, '')))[1:n]
 teste = startskel(s, 229, prob = T)
 ToDataFrameTree(teste, 'n', 'context', 'dom', 'p')
 print(teste, attributes = 'p')
+
+
+
+genskel_mod = function(node, sample, index, Nmin, prob = F){
+  #resultado 0
+  l = node$AddChild(paste0(node$name,'0'))
+  s = index[which(sample[index]==0)]+1
+  s = s[s<=max(index)]
+  n = length(s)
+  l$index = s
+  l$n = length(l$index)
+  l$context = paste0(node$context,'0')
+  l$dom = ifelse(sum(sample[s])%in%c(0,l$n), sample[s][1], -1)
+  if(prob) l$p = sum(sample[s])/n
+  if(length(l$index)>=Nmin){
+    genskel_mod(l, sample, l$index, Nmin, prob)
+  }
+  
+  #resultado 1
+  r = node$AddChild(paste0(node$name,'1'))
+  s = index[which(sample[index]==1)]+1
+  s = s[s<=max(index)]
+  n = length(s)
+  r$index = s
+  r$n = length(r$index)
+  r$context = paste0(node$context,'1')
+  r$dom = ifelse(sum(sample[s])%in%c(0,l$n), sample[s][1], -1)
+  if(prob) r$p = sum(sample[s])/n
+  if(length(r$index)>=Nmin){
+    genskel_mod(r, sample, r$index, Nmin, prob)
+  }
+}
+
+startskel_mod = function(sample, Nmin, prob = F){
+  raiz = Node$new("r")
+  raiz$index = 1:length(sample)
+  raiz$n = length(sample)
+  raiz$context = ''
+  raiz$dom = ifelse(sum(sample)%in%c(0,raiz$n), sample[1], -1)
+  if(prob) raiz$p = sum(sample)/raiz$n
+  
+  genskel_mod(raiz, sample, raiz$index, Nmin, prob = prob)
+  return(raiz)
+}
+
+verificacao_str = c(0,1,0,0,0,1,1,0)
+verificacao = startskel_mod(verificacao_str, 1, prob = T)
+d =ToDataFrameTree(verificacao, 'n', 'p')
+d[d$n>0,]
