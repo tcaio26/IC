@@ -5,9 +5,13 @@
 # a = sample(c(0,1),20,T)
 # a_txt = paste0(a, collapse='')
 
-match = function(str, p){ 
-  pos = stringr::str_locate_all(str, p)[[1]][, "end"]
-  return(pos+1)
+#o pacote stringi tem o parametro overlap = T, maravilhoso.
+
+match_str = function(str, p){ 
+  pos = stringi::stri_locate_all_fixed(str, p, overlap = T)[[1]][, "end"] +1 #retorna as posições logo após o contexto
+  pos = pos[pos<=nchar(str)] #evita ultrapassar o index maximo
+  if(is.na(pos)) pos = 0
+  return(pos)
 }
 # 
 # contexto_teste = '11'
