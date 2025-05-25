@@ -3,7 +3,7 @@ source('funcao_match.R')
 library(data.tree)
 
 
-startskel = function(sample_txt, Nmin, prob = F){
+startskel = function(sample_txt, Nmin, prob = F, debug = F){
   sample_vec = string_to_vec(sample_txt)
   raiz = Node$new("r")
   raiz$index = 1:length(sample_vec)
@@ -12,12 +12,12 @@ startskel = function(sample_txt, Nmin, prob = F){
   raiz$dom = -1
   if(prob) raiz$p = sum(sample_vec)/raiz$n
   
-  genskel(raiz, sample_vec, sample_txt, Nmin, prob = prob)
+  genskel(raiz, sample_vec, sample_txt, Nmin, prob = prob, debug)
   return(raiz)
 }
 
 
-genskel = function(node, sample_vec, sample_txt, Nmin, prob = F){
+genskel = function(node, sample_vec, sample_txt, Nmin, prob = F, debug = F){
   #resultado 0
   l = node$AddChild(paste0('0',node$name))
   w = paste0('0',node$context)
@@ -28,8 +28,9 @@ genskel = function(node, sample_vec, sample_txt, Nmin, prob = F){
   l$n = length(i)
   l$dom = ifelse(sum(sample_vec[i])%in%c(0,n), sample_vec[i][1], -1)
   if(prob) l$p = sum(sample_vec[i])/n
+  if(debug) print('OK')
   if(length(i)>=Nmin){
-    genskel(l, sample_vec, sample_txt, Nmin, prob)
+    genskel(l, sample_vec, sample_txt, Nmin, prob, debug)
   }
   
   
@@ -43,8 +44,9 @@ genskel = function(node, sample_vec, sample_txt, Nmin, prob = F){
   r$n = length(i)
   r$dom = ifelse(sum(sample_vec[i])%in%c(0,n), sample_vec[i][1], -1)
   if(prob) r$p = sum(sample_vec[i])/n
+  if(debug) print('OK')
   if(length(i)>=Nmin){
-    genskel(r, sample_vec, sample_txt, Nmin, prob)
+    genskel(r, sample_vec, sample_txt, Nmin, prob, debug)
   }
 }
 
