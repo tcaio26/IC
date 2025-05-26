@@ -29,22 +29,76 @@ arv_teste = function(n_start, corte){
   return(raiz)
 }
 
-t = arv_teste(20, 10)
+t = arv_teste(50, 10)
 ToDataFrameTree(t, 'n','p','x')
+saveRDS(t, 'arvore_teste.rds')
 
-nodos = Traverse(t, 'level')
+#FUNÇÕES TESTE
+
+t = readRDS('arvore_teste.rds')
+ToDataFrameTree(t, 'n', 'p', 'x')
 
 checknodo = function(nodo, par){
-  if(isLeaf(nodo)) return(FALSE)
+  if(isLeaf(nodo)) return(FALSE) #pula folhas
+  if(!all(sapply(nodo$children, isLeaf))) return(FALSE) #só quero cortar pais de folhas
   p1 = nodo$children[[1]][[par]]
   p2 = nodo$children[[2]][[par]]
-  if(identical(p1,p2)) return(TRUE) #deleta as crianças
-  else return(FALSE)
+  if(identical(p1,p2)) return(TRUE) #corta folhas com parâmetro idênticos
+  else return(FALSE) #pula
 }
 
 killchildren = function(nodo){
   nodo$children = NULL
 }
 
-killchildren(t$raizl)
-t
+sculptskeleton = function(t, par, copy = F, print=F){
+  if(copy) tree = Clone(t)
+  else tree = t
+  nodes = Traverse(tree, 'level')
+  levels = sapply(nodes, function(x) x$level)
+  k = tree$height
+  for(l in rev(1:(k-1))){
+    nds = nodes[levels==l]
+    to_trim = nds[sapply(nds, function(x) checknodo(x, par))]
+    if(print) print(paste(length(to_trim)*2, 'nodos serão removidos',sep=' '))
+    lapply(to_trim, FUN = killchildren)
+  }
+  if(copy) return(tree)
+}
+t_skel = sculptskeleton(t, 'x', copy = T, print = T)
+ToDataFrameTree(t, 'x')
+ToDataFrameTree(t_skel, 'x')
+
+
+#FUNÇÕES REAIS
+
+checknode = function(nodo, par, exception = NA){
+  if(isLeaf(nodo)) return(FALSE) #pula folhas
+  if(!all(sapply(nodo$children, isLeaf))) return(FALSE) #só quero cortar pais de folhas
+  p1 = nodo$children[[1]][[par]]
+  p2 = nodo$children[[2]][[par]]
+  if(!is.na(exception) && any(c(p1,p2)==exception)) return(FALSE) #adapta para dom = -1
+  else if(identical(p1,p2)) return(TRUE) #corta folhas com parâmetro idênticos
+  else return(FALSE) #pula
+}
+
+
+killchildren = function(nodo){
+  nodo$children = NULL
+}
+
+
+sculptskeleton = function(t, par, exeption = NA, copy = F, print=F){
+  if(copy) tree = Clone(t)
+  else tree = t
+  nodes = Traverse(tree, 'level')
+  levels = sapply(nodes, function(x) x$level)
+  k = tree$height
+  for(l in rev(1:(k-1))){
+    nds = nodes[levels==l]
+    to_trim = nds[sapply(nds, function(x) checknodo(x, par, exception))]
+    if(print) print(paste(length(to_trim)*2, 'nodos serão removidos',sep=' '))
+    lapply(to_trim, FUN = killchildren)
+  }
+  if(copy) return(tree)
+}
