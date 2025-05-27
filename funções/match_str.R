@@ -1,9 +1,9 @@
 #APENAS PARA A FUNÇÃO QUE ENCONTRA AS POSIÇÕES X_i TQ CONTEXTO = W
 
 #amostra para validação
-set.seed(247005)
-a = sample(c(0,1),20,T)
-a_txt = paste0(a, collapse='')
+# set.seed(247005)
+# a = sample(c(0,1),20,T)
+# a_txt = paste0(a, collapse='')
 
 #o pacote stringi tem o parametro overlap = T, maravilhoso.
 

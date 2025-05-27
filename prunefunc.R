@@ -72,14 +72,14 @@ ToDataFrameTree(t_skel, 'x')
 
 #FUNÇÕES REAIS
 
-checknode = function(nodo, par, exception = NA){
+shouldyoucut = function(nodo, par, Nmin){
   if(isLeaf(nodo)) return(FALSE) #pula folhas
   if(!all(sapply(nodo$children, isLeaf))) return(FALSE) #só quero cortar pais de folhas
-  p1 = nodo$children[[1]][[par]]
-  p2 = nodo$children[[2]][[par]]
-  if(!is.na(exception) && any(c(p1,p2)==exception)) return(FALSE) #adapta para dom = -1
-  else if(identical(p1,p2)) return(TRUE) #corta folhas com parâmetro idênticos
-  else return(FALSE) #pula
+  n1 = (nodo$children[[1]][['n']]) >= Nmin
+  n2 = (nodo$children[[2]][['n']]) >= Nmin
+  d1 = nodo$children[[1]][[par]]
+  d2 = nodo$children[[2]][[par]]
+  decision(n1,n2,d1,d2)
 }
 
 
@@ -88,7 +88,7 @@ killchildren = function(nodo){
 }
 
 
-sculptskeleton = function(t, par, exeption = NA, copy = F, print=F){
+sculptskeleton = function(t, Nmin, copy = F, print=F){
   if(copy) tree = Clone(t)
   else tree = t
   nodes = Traverse(tree, 'level')
@@ -96,9 +96,13 @@ sculptskeleton = function(t, par, exeption = NA, copy = F, print=F){
   k = tree$height
   for(l in rev(1:(k-1))){
     nds = nodes[levels==l]
-    to_trim = nds[sapply(nds, function(x) checknodo(x, par, exception))]
+    to_trim = nds[sapply(nds, function(x) shouldyoucut(x, 'x', Nmin))]
     if(print) print(paste(length(to_trim)*2, 'nodos serão removidos',sep=' '))
     lapply(to_trim, FUN = killchildren)
   }
   if(copy) return(tree)
 }
+
+teste = sculptskeleton(t, 10, copy = T, print = T)
+ToDataFrameTree(t, 'n', 'x')
+ToDataFrameTree(teste, 'n', 'x') #FUNCIONANDO, lembrar de trocar par por 'dom' depois
