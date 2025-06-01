@@ -27,7 +27,7 @@ genskel = function(node, sample_vec, sample_txt, Nmin, prob = F, debug = F){
     l$context = w
     l$index = numeric(0)
     l$n = 0
-    l$dom = -1
+    l$dom = 0
     if(prob) l$p = numeric(0)
     if(debug) print(paste0('nodo ',w,' vazio, OK'))
   }
@@ -36,10 +36,10 @@ genskel = function(node, sample_vec, sample_txt, Nmin, prob = F, debug = F){
     l$context = w
     l$index = i
     l$n = length(i)
-    l$dom = ifelse(sum(sample_vec[i])%in%c(0,n), sample_vec[i][1], -1)
+    l$dom = ifelse(sum(sample_vec[i])%in%c(0,n), (sample_vec[i][1] - (1-sample_vec[i][1])), 0) #0 vira -1, 1 continua
     if(prob) l$p = sum(sample_vec[i])/n
     if(debug) print('OK')
-    if(n>=Nmin){
+    if(n>=Nmin && l$dom==0){
       genskel(l, sample_vec, sample_txt, Nmin, prob, debug)
     } 
   }
@@ -53,7 +53,7 @@ genskel = function(node, sample_vec, sample_txt, Nmin, prob = F, debug = F){
     r$context = w
     r$index = numeric(0)
     r$n = 0
-    r$dom = -1
+    r$dom = 0
     if(prob) r$p = numeric(0)
     if(debug) print(paste0('nodo ',w,' vazio, OK'))
   }
@@ -62,19 +62,20 @@ genskel = function(node, sample_vec, sample_txt, Nmin, prob = F, debug = F){
     r$context = w
     r$index = i
     r$n = length(i)
-    r$dom = ifelse(sum(sample_vec[i])%in%c(0,n), sample_vec[i][1], -1)
+    r$dom = ifelse(sum(sample_vec[i])%in%c(0,n), (sample_vec[i][1] - (1-sample_vec[i][1])), 0)
     if(prob) r$p = sum(sample_vec[i])/n
     if(debug) print('OK')
-    if(n>=Nmin){
+    if(n>=Nmin && r$dom==0){
       genskel(r, sample_vec, sample_txt, Nmin, prob, debug)
     } 
   }
 }
 
-# t = startskel('01000110', 1, T, T)
-# df = ToDataFrameTree(t, 'context','n','p')
-# df = df[df$n>0,]
-# df[order(nchar(df$context)),]
+t = startskel('01000110', 1, T, T)
+df = ToDataFrameTree(t, 'context','n','p', 'dom')
+df = df[df$n>0,]
+df
+df[order(nchar(df$context)),]
 # 
 # library(rbenchmark)
 # 
@@ -109,3 +110,13 @@ genskel = function(node, sample_vec, sample_txt, Nmin, prob = F, debug = F){
 #   ggplot2::theme_bw()+
 #   ggplot2::labs(title='Tempo por tamanho de string, com Nmin=100, sem corte pós árvore')
 # dev.off()
+
+source('funções/startskel.R')
+source('funções/sculptskeleton.R')
+teste = readLines('amostra_skel_100k.txt')
+
+arvore = startskel(teste, 1000, prob = T)
+ToDataFrameTree(arvore, 'n', 'p', 'dom')
+skel_teste = sculptskeleton(arvore, 1000, copy = T)
+
+ToDataFrameTree(skel_teste, 'context', 'n', 'p','dom')
