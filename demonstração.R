@@ -10,7 +10,6 @@ amostra = readLines('amostra_skel_100k.txt')
 skel$skel
 skel$matrix
 
-
 #Funções separadas
 (Nmin = log(0.05,0.99))
 (arvore = startskel(amostra, 299, prob = T))
@@ -22,10 +21,8 @@ ToDataFrameTree(esqueleto, 'context','p','dom','n', filterFun = isLeaf)[,-1]
 
 (M = skel_matrix(esqueleto))
 
-k = ncol(M)
-M_sum = M
-M_prod = M
-for(i in 2:k){
-  M_prod = M_prod%*%M
-  M_sum = M_sum + M_prod
-}
+
+#Propriedades de M
+irr = irreductible(M, ReturnMatrix = T)
+irr$irred
+irr$Q #se existir uma transição proibida com contexto < k, onde k é a ordem do esqueleto, M não é irredutível.
