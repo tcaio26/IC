@@ -126,7 +126,7 @@ for(i in 3:length(probabilidades)){
   if(prob<=0.05) prob = 0.06
   probabilidades[i] = prob
   print(prob)
-  p = 1-prob #evitar probabilidades parecidas entre contextos parecidos. Talvez seja melhor usar sort(contextos).
+  p = 1-prob #evitar probabilidades parecidas entre contextos parecidos.
 }
 
 #Exportação de contextos e probabilidades para fácil acesso

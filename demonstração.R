@@ -1,8 +1,12 @@
 ###DEMONSTRAÇÃO
+setwd("Documents/codigos/r_data/IC")
 library(skeleton)
+#Geração da amostra: contextos
+View(read.csv('parametros_geradores_amostra.csv'))
+
 #Amostra está em simulacao_base.R
 
-amostra = readLines('amostra_skel_100k.txt')
+amostra = readLines('amostra_skel_100k.txt', warn = FALSE)
 
 ##Função geral
 (skel = generate_skeleton(amostra, alpha = 0.05, sensibility = 0.01))
@@ -10,9 +14,11 @@ amostra = readLines('amostra_skel_100k.txt')
 skel$skel
 skel$matrix
 
+#Limpando
+rm(skel)
 #Funções separadas
-(Nmin = log(0.05,0.99))
-(arvore = startskel(amostra, 299, prob = T))
+(Nmin = ceiling(log(0.05,0.99)))
+(arvore = startskel(amostra, Nmin, prob = T))
 
 (esqueleto = sculptskeleton(arvore, 299, copy = T, print = T))
 
@@ -23,6 +29,4 @@ ToDataFrameTree(esqueleto, 'context','p','dom','n', filterFun = isLeaf)[,-1]
 
 
 #Propriedades de M
-irr = irreductible(M, ReturnMatrix = T)
-irr$irred
-irr$Q #se existir uma transição proibida com contexto < k, onde k é a ordem do esqueleto, M não é irredutível.
+irreductible(M)
