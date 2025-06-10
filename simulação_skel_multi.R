@@ -71,6 +71,9 @@ sim_cemav = function(n, probabilidades, amostra_inicial = c(),
     amostra_inicial = paste(sample(alphabet, d*2, T), collapse = '')
   }
   if(missing(alphabet)) alphabet = sort(alphabet)
+  if(!missing(amostra_inicial) && !all(unique(string_to_vec(amostra_inicial))%in%alphabet)){
+    stop("starting sample contains a symbol not present in the alphabet.")
+  }
   l = nchar(amostra_inicial)
   if(show_process) print(paste("amostra inicial:", amostra_inicial))
   
@@ -92,7 +95,7 @@ sim_cemav = function(n, probabilidades, amostra_inicial = c(),
   else return(strsplit(amostra, ''))
 }
 t = '120120210300'
-amostra = sim_cemav(1e5, probabilities, alphabet = c('0','1','2','3'), show_process = T)
+amostra = sim_cemav(1e6, probabilities, alphabet = c('0','1','2','3'), show_process = T)
 
-cat(amostra, file = 'amostra_a_4_100k.txt')
+cat(amostra, file = 'amostra_a_4_1M.txt')
 
