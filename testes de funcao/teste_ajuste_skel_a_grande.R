@@ -69,9 +69,9 @@ sculptskeleton2 = function(root, Nmin, copy=F, declare = F){
   if(copy) return(skel)
 }
 
-teste = startskel2(a_teste, c('0','1','2','3'), 100)
+teste = startskel2(amostra, c('0','1','2','3'), Nmin)
 print(teste, 'context','n','transitions')
-(skel_teste = sculptskeleton2(teste, 100, copy=T, declare=T))
+(skel_teste = sculptskeleton2(teste, Nmin, copy=T, declare=T))
 
 ##extraindo transições
 contexts = Traverse(skel_teste, filterFun = isLeaf)
