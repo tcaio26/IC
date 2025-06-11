@@ -57,9 +57,9 @@ shouldyoucut2 = function(parent, Nmin){
 sculptskeleton2 = function(root, Nmin, copy=F, declare = F){
   if(copy) skel = Clone(root)
   else skel = root
-  nodes = Traverse(root,'level')
+  nodes = Traverse(skel,'level')
   levels = sapply(nodes, function(node) node$level)
-  d = root$height
+  d = skel$height
   for(l in (d-1):1){
     selected = nodes[levels==l]
     to_prune = selected[sapply(selected, function(node) shouldyoucut2(node, Nmin))]
@@ -71,20 +71,30 @@ sculptskeleton2 = function(root, Nmin, copy=F, declare = F){
 
 teste = startskel2(a_teste, c('0','1','2','3'), 100)
 print(teste, 'context','n','transitions')
-(sculptskeleton2(teste, 100, copy = T, declare=T))
+(skel_teste = sculptskeleton2(teste, 100, copy=T, declare=T))
 
-
-
-
-
-teste_sculpt = Clone(teste)
-nodes = Traverse(teste_sculpt,'level')
-levels = sapply(nodes, function(node) node$level)
-d = teste_sculpt$height
-for(l in (d-1):1){
-  selected = nodes[levels==l]
-  to_prune = selected[sapply(selected, function(node) shouldyoucut2(node, 100))]
-  print(paste0(length(to_prune),' nodes to be pruned'))
-  lapply(to_prune, function(parent) parent$children = NULL)
+##extraindo transições
+contexts = Traverse(skel_teste, filterFun = isLeaf)
+transitions = lapply(contexts, function(leaf) leaf$transitions)
+names(transitions) = sapply(contexts, function(leaf) leaf$context)
+pasts = apply(expand.grid(replicate(d, alfabeto, simplify = FALSE)), 1, paste0, collapse = "")
+full_transitions = probabilities = replicate(length(alfabeto)^d, rep(0,length(alfabeto)), simplify = FALSE)
+getMaxContext = function(contexts, string){
+  candidates = contexts[sapply(contexts, function(str) grepl(paste0(str,'$'), string))]
+  if(length(candidates)>0) return(candidates[[which.max(nchar(candidates))]])
+  return(NULL)
 }
-print(teste_sculpt, 'context', 'n', 'transitions')
+for(w in 1:length(pasts)){
+  full_transitions[[w]]=transitions[[getMaxContext(names(transitions),pasts[w])]]
+}
+names(full_transitions)=pasts
+
+#transformando em matriz
+M = matrix(0, nrow = length(full_transitions), ncol = length(full_transitions),
+           dimnames = list(names(full_transitions), names(full_transitions)))
+
+d = nchar(names(full_transitions)[[1]])
+for(w in names(full_transitions)){
+  possible_transitions = paste0(substr(w,2,d),alfabeto)
+  M[w,possible_transitions] = full_transitions[[w]]
+}
