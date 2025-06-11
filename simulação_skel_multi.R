@@ -59,7 +59,25 @@ for(s in 1:length(suffixes)){
 }
 names(probabilities) = suffixes
 
+lobstr::obj_size(probabilities)
 
+#transformar uma lista nomeada em matriz de probabilidades
+M = matrix(0, nrow = length(probabilities), ncol = length(probabilities),
+           dimnames = list(names(probabilities), names(probabilities)))
+
+d = nchar(names(probabilities)[[1]])
+for(w in names(probabilities)){
+  possible_transitions = paste0(substr(w,2,d),A)
+  M[w,possible_transitions] = probabilities[[w]]
+}
+
+#reverso
+probabilities = replicate(a^d, rep(0,a), simplify = FALSE)
+names(probabilities) = rownames(M)
+for(w in rownames(M)){
+  probabilities[[w]] = as.vector(unname(M[w,paste0(substr(w,2,d),A)]))
+}
+lobstr::obj_size(probabilities)
 
 #adaptar simulação binária usada
 sim_cemav = function(n, probabilidades, amostra_inicial = c(),
