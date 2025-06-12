@@ -77,6 +77,7 @@ print(teste, 'context','n','transitions')
 contexts = Traverse(skel_teste, filterFun = isLeaf)
 transitions = lapply(contexts, function(leaf) leaf$transitions)
 names(transitions) = sapply(contexts, function(leaf) leaf$context)
+d=3
 pasts = apply(expand.grid(replicate(d, alfabeto, simplify = FALSE)), 1, paste0, collapse = "")
 full_transitions = probabilities = replicate(length(alfabeto)^d, rep(0,length(alfabeto)), simplify = FALSE)
 getMaxContext = function(contexts, string){
@@ -98,3 +99,4 @@ for(w in names(full_transitions)){
   possible_transitions = paste0(substr(w,2,d),alfabeto)
   M[w,possible_transitions] = full_transitions[[w]]
 }
+
