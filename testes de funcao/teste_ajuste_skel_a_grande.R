@@ -74,6 +74,25 @@ print(teste, 'context','n','transitions')
 (skel_teste = sculptskeleton2(teste, Nmin, copy=T, declare=T))
 
 ##extraindo transições
+extractTransitions = function(skeleton){
+  contexts = Traverse(skel_teste, filterFun = isLeaf)
+  d = max(nchar(contexts))
+  transitions = lapply(contexts, function(leaf) leaf$transitions)
+  names(transitions) = sapply(contexts, function(leaf) leaf$context)
+  pasts = apply(expand.grid(replicate(d, alfabeto, simplify = FALSE)), 1, paste0, collapse = "")
+  full_transitions = probabilities = replicate(length(alfabeto)^d, rep(0,length(alfabeto)), simplify = FALSE)
+  getMaxContext = function(contexts, string){
+    candidates = contexts[sapply(contexts, function(str) grepl(paste0(str,'$'), string))]
+    if(length(candidates)>0) return(candidates[[which.max(nchar(candidates))]])
+    return(NULL)
+  }
+  for(w in 1:length(pasts)){
+    full_transitions[[w]]=transitions[[getMaxContext(names(transitions),pasts[w])]]
+  }
+  names(full_transitions)=pasts
+  return(full_transitions)
+}
+
 contexts = Traverse(skel_teste, filterFun = isLeaf)
 transitions = lapply(contexts, function(leaf) leaf$transitions)
 names(transitions) = sapply(contexts, function(leaf) leaf$context)
@@ -100,3 +119,13 @@ for(w in names(full_transitions)){
   M[w,possible_transitions] = full_transitions[[w]]
 }
 
+######## função geral
+generate_skeleton2 = function(string, Nmin,
+                              alphabet = sort(unique(unlist(strsplit(string,'')))),
+                              alpha = 0.05, sensibility = 0.01){
+  #checagem de inputs
+  if(missing(Nmin)) Nmin = ceiling(log(alpha, 1-sensibility) - log(length(alphabet), 1-sensibility))
+  root = startskel2(string, alphabet, Nmin)
+  sculptskeleton2(root, Nmin)
+  
+}
