@@ -5,7 +5,6 @@ skel_contexts = list(
   '00' = c(1,1,0,1), '300' = c(0,1,0,0), '12' = c(1,0,1,0), '3' = c(1,1,0,0) #transições permitidas
 )
 
-(init_vector = vec_to_string(sample(c(0,1,2,3), 10, replace = TRUE))) #mover mais pra frente
 
 c = max(nchar(skel_contexts)) #parâmetros, alguns serão automáticos
 d = 5 #testando com 3, mudar p 5
@@ -25,10 +24,6 @@ getMaxContext = function(contexts, string){
   if(length(candidates)>0) return(candidates[[which.max(nchar(candidates))]])
   return(NULL)
 }
-t = '120120210300'
-getMaxContext(names(skel_contexts), t) #300
-getMaxContext(c('a','bb','ac'), t) #NULL
-
 
 #para um contexto com transições proibidas e permitidas, como garantir que gere probs validas? idealmente entre 0.05 e 0.95
 generate_probs = function(n, lower.bound = 0.05){
@@ -42,9 +37,6 @@ generate_probs = function(n, lower.bound = 0.05){
   }
   return(probs)
 }
-transicoes = c(1,1,0,0)
-probs = c(0,0,0,0)
-probs[which(transicoes==1)] = generate_probs(sum(transicoes))
 
 #associar probabilidades de forma aleatória
 probabilities = replicate(a^d, rep(0,a), simplify = FALSE)
@@ -113,7 +105,7 @@ sim_cemav = function(n, probabilidades, amostra_inicial = c(),
   else return(strsplit(amostra, ''))
 }
 t = '120120210300'
-amostra = sim_cemav(1e6, probabilities, alphabet = c('0','1','2','3'), show_process = T)
+amostra = sim_cemav(1e5, probabilities, alphabet = c('0','1','2','3'), show_process = T)
 
 cat(amostra, file = 'amostra_a_4_1M.txt')
 

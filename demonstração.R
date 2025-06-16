@@ -30,3 +30,10 @@ ToDataFrameTree(esqueleto, 'context','p','dom','n', filterFun = isLeaf)[,-1]
 
 #Propriedades de M
 irreductible(M)
+
+
+########## |A|>2
+amostra = readLines('amostra_a_4_100k.txt')
+t = generate_skeleton2(amostra)
+t$skel
+t$transitions
