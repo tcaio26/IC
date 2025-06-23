@@ -2,20 +2,20 @@ library(skeleton)
 library(tibble)
 set.seed(247005)
 skel_contexts = list(
-  '00' = c(1,1,0,1), '300' = c(0,1,0,0), '12' = c(1,0,1,0), '3' = c(1,1,0,0) #transições permitidas
+  'a_a' = c(1,1,0,1), 'dd_a_a' = c(0,1,0,0), 'b_c' = c(1,0,1,0), 'dd' = c(1,1,0,0) #transições permitidas
 )
+separator = '_'
+alphabet = c('a','b','c','dd')
 
-
-c = max(nchar(skel_contexts)) #parâmetros, alguns serão automáticos
+c = max(sapply(names(skel_contexts), function(x) length(strsplit(x, separator)[[1]]))) #parâmetros, alguns serão automáticos
 d = 5 #testando com 3, mudar p 5
-A = c('0','1','2','3')
+A = c('a','b','c','dd')
 a = length(A)
 
-
 #criar todos os sufixos de tamanho d possível
-suffixes = apply(expand.grid(replicate(d, A, simplify = FALSE)), 1, paste0, collapse = "")
+suffixes = apply(expand.grid(replicate(d, A, simplify = FALSE)), 1, paste, sep = separator, collapse = separator)
 length(suffixes) #deve ser a^d
-
+suffixes = paste0(separator, suffixes) #garante que não vai pegar símbolos no meio.
 ###### FUNÇÕES AUXILIARES
 #para uma lista/vetor de contexto e uma string s, retorne o maior contexto que seja parte do final de s.
 #usando o skel_contexts mesmo
@@ -24,6 +24,9 @@ getMaxContext = function(contexts, string){
   if(length(candidates)>0) return(candidates[[which.max(nchar(candidates))]])
   return(NULL)
 }
+
+#teste com separador e símbolos
+getMaxContext(paste0('_',names(skel_contexts)), 'a_a_a_b_c_dd_a_a')
 
 #para um contexto com transições proibidas e permitidas, como garantir que gere probs validas? idealmente entre 0.05 e 0.95
 generate_probs = function(n, lower.bound = 0.05){
@@ -57,9 +60,11 @@ lobstr::obj_size(probabilities)
 M = matrix(0, nrow = length(probabilities), ncol = length(probabilities),
            dimnames = list(names(probabilities), names(probabilities)))
 
-d = nchar(names(probabilities)[[1]])
+d = length(strsplit(names(probabilities)[1], separator)[[1]])-1 #espaço vazio no início
 for(w in names(probabilities)){
-  possible_transitions = paste0(substr(w,2,d),A)
+  possible_transitions = paste(
+    paste(strsplit(w, separator)[[1]][c(1,3:(d+1))], collapse = separator), A, sep = separator
+  )
   M[w,possible_transitions] = probabilities[[w]]
 }
 
@@ -67,45 +72,50 @@ for(w in names(probabilities)){
 probabilities = replicate(a^d, rep(0,a), simplify = FALSE)
 names(probabilities) = rownames(M)
 for(w in rownames(M)){
-  probabilities[[w]] = as.vector(unname(M[w,paste0(substr(w,2,d),A)]))
+  possible_transitions = paste(
+    paste(strsplit(w, separator)[[1]][c(1,3:(d+1))], collapse = separator), A, sep = separator
+  )
+  probabilities[[w]] = as.vector(unname(M[w,possible_transitions]))
 }
 lobstr::obj_size(probabilities)
 
 #adaptar simulação binária usada
-sim_cemav = function(n, probabilidades, amostra_inicial = c(),
+sim_cemav = function(n, probabilidades, amostra_inicial = c(), separator = '_',
                      alphabet = unique(string_to_vec(amostra_inicial)), text = T, show_process=F){
-  d = nchar(names(probabilidades)[1])
+  d = length(strsplit(names(probabilidades)[1], separator)[[1]])-1
   if(show_process) print(paste("ordem:", d))
   if(length(amostra_inicial)==0){
     if(missing(alphabet)) stop("if no initial sample is given, an alphabet must be provided")
-    amostra_inicial = paste(sample(alphabet, d*2, T), collapse = '')
+    amostra_inicial = paste(sample(alphabet, d*2, T), collapse = separator)
   }
   if(missing(alphabet)) alphabet = sort(alphabet)
-  if(!missing(amostra_inicial) && !all(unique(string_to_vec(amostra_inicial))%in%alphabet)){
+  if(!missing(amostra_inicial) && !all(unique(strsplit(amostra_inicial, separator)[[1]])%in%alphabet)){
     stop("starting sample contains a symbol not present in the alphabet.")
   }
-  l = nchar(amostra_inicial)
   if(show_process) print(paste("amostra inicial:", amostra_inicial))
+  l = length(strsplit(amostra_inicial, separator)[[1]])
   
-  amostra = amostra_inicial
+  amostra = numeric(n+l)
+  amostra[1:l] = strsplit(amostra_inicial, separator)[[1]]
   
-  for(i in (l):(n+l)){
-    shortPast = substr(amostra, i-d+1, i)
+  for(i in (l+1):(n+l)){
+    shortPast = paste(c('',amostra[(i-d):(i-1)]), collapse = separator)
     
     if(is.null(probabilidades[[shortPast]])) stop(glue::glue("SEM CONTEXTO PARA {shortPast}"))
     
     x = sample(alphabet, 1, prob = probabilidades[[shortPast]])
-    amostra = paste0(amostra, x)
+    amostra[i] = x
     
-    if(show_process) if(i %in% round((1:100)*(n+l)/100, digits = 0))print(glue::glue("{round((i)*100/(n+l))}%"))
+    if(show_process) if(i %in% round((1:100)*(n)/100, digits = 0))print(glue::glue("{round((i+l)*100/(n+l))}%"))
   }
-  amostra = substr(amostra, l+1,n+l)
+  amostra = amostra[(l+1):(n+l)]
   
-  if(text) return(amostra)
-  else return(strsplit(amostra, ''))
+  if(text) return(paste(amostra, collapse = separator))
+  else amostra
 }
-t = '120120210300'
-amostra = sim_cemav(1e5, probabilities, alphabet = c('0','1','2','3'), show_process = T)
+
+amostra = sim_cemav(1e5, probabilities, separator = '_',
+                    alphabet = c('a','b','c','dd'), show_process = T)
 
 cat(amostra, file = 'amostra_a_4_1M.txt')
 
