@@ -1,13 +1,15 @@
 library(skeleton)
-amostra = readLines('amostra_a_4_100k.txt')
-a_teste = substr(amostra,1,5000)
+amostra = readLines('amostra_chuva_4_100k.txt')
+a_teste = strsplit(amostra, ' ')[[1]][1:5000]
 
-alfabeto = sort(unique(unlist(strsplit(a_teste,''))))
-
+separator = ' '
+A = sort(unique(unlist(strsplit(a_teste, separator))))
+A = c('sol', 'nuvem', 'chuva', 'tempestade') #exato
+  
 a = 0.05
 y = 0.01
 
-Nmin = ceiling(log(a, 1-y) - log(length(alfabeto), 1-y))
+Nmin = ceiling(log(a, 1-y) - log(length(A), 1-y))
 
 #importando função de probabilidades enquanto eu não coloco no pacote
 symbolcounts = function(str, pattern, alphabet){
@@ -17,14 +19,59 @@ symbolcounts = function(str, pattern, alphabet){
   sapply(as.numeric(alphabet), function(s) sum(vec==s))
 }
 
+#com símbolos de mais de 2 caracteres vou precisar de uma nova função match
+findNextPos = function(longvec, shortvec){
+  stopifnot(length(longvec)>=length(shortvec))
+  if(all(is.na(shortvec))) return(1:length(longvec)) #equivalente de match_str(str, '')
+  max = length(longvec) #não quero matches sem elementos depois
+  d = length(shortvec)
+  pos = (d:length(longvec))[vapply(d:length(longvec), 
+                                   function(i) all(longvec[(i-d+1):i]==shortvec), 
+                                   FUN.VALUE = logical(1))]
+  return(pos[pos+1<=max]+1)
+}
+
+#com símbolos de mais de 2 caracteres vou precisar de uma nova função match
+findNextPos = function(longvec, shortvec){
+  stopifnot(length(longvec)>=length(shortvec))
+  if(all(is.na(shortvec))) return(1:length(longvec)) #equivalente de match_str(str, '')
+  max = length(longvec) #não quero matches sem elementos depois
+  findchar = 
+  return(pos[pos+1<=max]+1)
+}
+
+symbolcounts2 = function(sample, pattern, alphabet){
+  positions = findNextPos(sample, pattern)
+  if(length(positions)==0) return(numeric(length(alphabet)))
+  vec = sample[positions]
+  vapply(alphabet, function(s) sum(vec==s), FUN.VALUE = numeric(1))
+}
+
+symbolcounts2(t, NA, A)
+
+#vamos ver o tamanho da piora
+a_vec = strsplit(readLines('amostra_chuva_4_100k.txt'), ' ')[[1]]
+a_txt = readLines('amostra_a_4_100k.txt')
+
+rbenchmark::benchmark(
+  funAntiga = symbolcounts(a_txt, '0', c('0','1','2','3')),
+  funNova = symbolcounts2(a_vec, 'sol', A)
+) #1 símbolo já piora muito
+
+rbenchmark::benchmark(
+  funAntiga = symbolcounts(a_txt, '01203', c('0','1','2','3')),
+  funNova = symbolcounts2(a_vec, sample(A,5,T), A)
+) #com uma sequencia de 5. MUITO PIOR, TENTAR OTIMIZAR PARA O PACOTE DEPOIS
+
+
 ####startskel
-startskel2 = function(string, alphabet, Nmin){
+startskel2 = function(sample, alphabet, Nmin, sep = ' '){
   root = Node$new('r')
   root$context = ''
-  root$counts = symbolcounts(string, '', alphabet)
-  root$n = nchar(string)
+  root$counts = symbolcounts(sample, NA, alphabet)
+  root$n = lenth(sample)
   
-  genskel2(root, string, alphabet, Nmin)
+  genskel2(root, sample, alphabet, Nmin, sep = ' ')
   
   lapply(Traverse(root), function(node) node$transitions = (node$counts>0))
   

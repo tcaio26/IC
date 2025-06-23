@@ -2,14 +2,15 @@ library(skeleton)
 library(tibble)
 set.seed(247005)
 skel_contexts = list(
-  'a_a' = c(1,1,0,1), 'dd_a_a' = c(0,1,0,0), 'b_c' = c(1,0,1,0), 'dd' = c(1,1,0,0) #transições permitidas
+  'sol sol' = c(1,1,0,1), 'tempestade sol sol' = c(0,1,0,0),
+  'nuvem chuva' = c(1,0,1,0), 'tempestade' = c(1,1,0,0) #transições permitidas
 )
-separator = '_'
-alphabet = c('a','b','c','dd')
+separator = ' '
+alphabet = c('sol','nuvem','chuva','tempestade')
 
 c = max(sapply(names(skel_contexts), function(x) length(strsplit(x, separator)[[1]]))) #parâmetros, alguns serão automáticos
 d = 5 #testando com 3, mudar p 5
-A = c('a','b','c','dd')
+A = c('sol','nuvem','chuva','tempestade')
 a = length(A)
 
 #criar todos os sufixos de tamanho d possível
@@ -114,8 +115,8 @@ sim_cemav = function(n, probabilidades, amostra_inicial = c(), separator = '_',
   else amostra
 }
 
-amostra = sim_cemav(1e5, probabilities, separator = '_',
-                    alphabet = c('a','b','c','dd'), show_process = T)
+amostra = sim_cemav(1e5, probabilities, separator = ' ',
+                    alphabet = c('sol','nuvem','chuva','tempestade'), show_process = T)
 
-cat(amostra, file = 'amostra_a_4_1M.txt')
+cat(amostra, file = 'amostra_chuva_4_100k.txt')
 
