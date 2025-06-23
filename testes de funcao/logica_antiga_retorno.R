@@ -5,7 +5,7 @@ A = c('0','1','2','3')
 
 
 ####startskel de volta com lógica de vetor
-startskel3 = function(sample, alphabet, Nmin, sep = '|'){
+startskel3 = function(sample, alphabet, Nmin, sep = '|', contextsep = sep){
   root = Node$new('r')
   root$context = ''
   root$index = 1:length(sample)
@@ -14,18 +14,22 @@ startskel3 = function(sample, alphabet, Nmin, sep = '|'){
   
   genskel3(root, 1, sample, alphabet, Nmin, sep)
   
-  lapply(Traverse(root), function(node) node$transitions = (node$counts>0))
+  lapply(Traverse(root), function(node){
+    transitions = (node$counts>0)
+    if(sum(transitions)==0) transitions = c(T,T,T,T) #não assumimos nada para nodos não observados.
+    node$transitions = transitions
+    })
   
   return(root)
 }
 
 #genskel
-genskel3 = function(parent, order, sample, alphabet, Nmin, sep = '|'){
+genskel3 = function(parent, order, sample, alphabet, Nmin, sep = '|', contextsep = sep){
   possible_index = parent$index[parent$index>order]
   
   for(u in alphabet){
     node = parent$AddChild(paste0(u, sep, parent$name))
-    node$context = paste0(u, sep, parent$context)
+    node$context = paste0(u, contextsep, parent$context)
     node$index = possible_index[which(sample[possible_index-order]==u)]
     node$counts = table(factor(sample[node$index], levels = alphabet))
     node$n = sum(node$counts)
