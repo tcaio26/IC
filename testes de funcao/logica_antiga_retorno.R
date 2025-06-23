@@ -45,3 +45,17 @@ Nmin = ceiling(log(a, 1-y) - log(length(A), 1-y))
 teste = startskel3(a_teste, A, Nmin)
 print(teste, 'context','n','transitions')
 (skel_teste = sculptskeleton2(teste, Nmin, copy=T, declare=T)) |> print('context','n','transitions')
+
+
+
+
+
+#teste do pacote
+rm(list = ls(all.names = T))
+library(skeleton)
+amostra = strsplit(readLines("amostra_chuva_4_100k.txt"),' ')[[1]]
+A = c('sol','nuvem','chuva','tempestade')
+Nmin = ceiling(log(0.05, 0.99) - log(4, 0.99))
+demo = startskel(amostra, A, Nmin)
+sculptskeleton(demo, Nmin, declare = T)
+print(demo, 'context','n','transitions')
