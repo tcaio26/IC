@@ -121,22 +121,22 @@ print(teste, 'context','n','transitions')
 (skel_teste = sculptskeleton2(teste, Nmin, copy=T, declare=T))
 
 ##extraindo transições
-extractTransitions = function(skeleton){
+extractTransitions = function(skeleton, A, sep){
   contexts = Traverse(skeleton, filterFun = isLeaf)
-  d = max(sapply(contexts, function(leaf) nchar(leaf$context)))
+  d = max(vapply(contexts, function(leaf) length(strsplit(leaf$context, sep)[[1]]), FUN.VALUE = integer(1)))
   transitions = lapply(contexts, function(leaf) leaf$transitions)
-  names(transitions) = sapply(contexts, function(leaf) leaf$context)
-  pasts = apply(expand.grid(replicate(d, alfabeto, simplify = FALSE)), 1, paste0, collapse = "")
-  full_transitions = probabilities = replicate(length(alfabeto)^d, rep(0,length(alfabeto)), simplify = FALSE)
+  names(transitions) = vapply(contexts, function(leaf) leaf$context, FUN.VALUE = character(1))
+  pasts = apply(expand.grid(replicate(d, A, simplify = FALSE)), 1, paste0, collapse = sep)
+  full_transitions = probabilities = replicate(length(A)^d, rep(0,length(A)), simplify = FALSE)
   for(w in 1:length(pasts)){
-    full_transitions[[w]]=transitions[[getMaxContext(names(transitions),pasts[w])]]
+    full_transitions[[w]]=
+      transitions[[getMaxContext(names(transitions),paste0(pasts[w],sep))]]
   }
   names(full_transitions)=pasts
   return(full_transitions)
 }
 
-#transformando em matriz
-extractTransitions(skel_teste)
+
 
 ######## função geral
 generate_skeleton2 = function(string, Nmin,
