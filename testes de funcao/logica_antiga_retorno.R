@@ -1,7 +1,7 @@
 library(skeleton)
-amostra = readLines('amostra_a_4_100k.txt')
-a_teste = strsplit(amostra, '')[[1]] |> as.factor()
-A = c('0','1','2','3')
+amostra = readLines('amostra_chuva_4_100k.txt')
+a_teste = strsplit(amostra, ' ')[[1]] |> factor( levels = c('sol','nuvem','chuva','tempestade'))
+A = levels(a_teste)
 
 
 ####startskel de volta com lógica de vetor
@@ -42,6 +42,6 @@ a = 0.05
 y = 0.01
 
 Nmin = ceiling(log(a, 1-y) - log(length(A), 1-y))
-teste = startskel3(a_teste, c('0','1','2','3'), Nmin)
+teste = startskel3(a_teste, A, Nmin)
 print(teste, 'context','n','transitions')
 (skel_teste = sculptskeleton2(teste, Nmin, copy=T, declare=T)) |> print('context','n','transitions')
