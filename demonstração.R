@@ -1,39 +1,14 @@
 ###DEMONSTRAÇÃO
 setwd("Documents/codigos/r_data/IC")
 library(skeleton)
-#Geração da amostra: contextos
-View(read.csv('parametros_geradores_amostra.csv'))
 
-#Amostra está em simulacao_base.R
+amostra = strsplit(readLines("amostra_chuva_4_100k.txt"), ' ')[[1]]
 
-amostra = readLines('amostra_skel_100k.txt', warn = FALSE)
+esqueleto_chuva = skeleton(amostra, c('sol','nuvem','chuva','tempestade'))
 
-##Função geral
-(skel = generate_skeleton(amostra, alpha = 0.05, sensibility = 0.01))
+print(esqueleto_chuva$skeleton, 'n','transitions')
 
-skel$skel
-skel$matrix
+View(esqueleto_chuva$matrix)
 
-#Limpando
-rm(skel)
-#Funções separadas
-(Nmin = ceiling(log(0.05,0.99)))
-(arvore = startskel(amostra, Nmin, prob = T))
+irreductible(esqueleto_chuva$matrix)
 
-(esqueleto = sculptskeleton(arvore, 299, copy = T, print = T))
-
-ToDataFrameTree(esqueleto, 'context','p','dom','n')
-ToDataFrameTree(esqueleto, 'context','p','dom','n', filterFun = isLeaf)[,-1]
-
-(M = skel_matrix(esqueleto))
-
-
-#Propriedades de M
-irreductible(M)
-
-
-########## |A|>2
-amostra = readLines('amostra_a_4_100k.txt')
-t = generate_skeleton2(amostra)
-t$skel
-t$transitions
