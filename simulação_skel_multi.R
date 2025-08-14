@@ -120,3 +120,8 @@ amostra = sim_cemav(1e5, probabilities, separator = ' ',
 
 cat(amostra, file = 'amostra_chuva_4_100k.txt')
 
+rbenchmark::benchmark(sim_cemav(1e5, probabilities, separator = ' ', alphabet = c('sol','nuvem','chuva','tempestade')),
+                      replications = 10)
+
+rbenchmark::benchmark(sim_cemav(1e5, probabilities, separator = ' ', alphabet = c('sol','nuvem','chuva','tempestade')),
+                      replications = 1)
